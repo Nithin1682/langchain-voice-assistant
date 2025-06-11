@@ -1,0 +1,17 @@
+# Ignore virtual environment
+langgraph-env/
+
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*.so
+
+# Database file (optional)
+*.db
+
+# Environment variables / API keys
+.env
+
+# OS generated files
+.DS_Store
+Thumbs.db
