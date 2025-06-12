@@ -1,88 +1,72 @@
-# 🧠 LangChain Voice Assistant (Groq + Clipboard Tools)
+Project Title: LangChain + Groq AI Assistant with Timetable, Grammar, and Emoji Support
 
-This is a smart desktop assistant built with **LangChain**, **Groq**, and Python. It supports **text and voice interaction**, clipboard tools like **grammar correction** and **emoji suggestion**, and allows **timetable management** using a GUI.
+🧠 Description:
+This is an AI-powered personal assistant that uses LangChain + Groq APIs. It supports both text and voice input, and allows you to:
 
----
+✅ Extract your weekly timetable from an image
+🗑️ Delete existing timetable
+✍️ Check grammar and spelling mistakes from copied text
+😊 Suggest relevant emojis for a given sentence
+🎤 Activate via voice with wake word: "hey google"
 
-## 🚀 How to Run
+All features work via text CLI or voice control.
 
-### 🖥️ Text Mode (Terminal)
+🗃️ Project Structure:
+plaintext
+Copy
+Edit
+├── chatbot_core.py       # Main text assistant using LangChain + Groq
+├── voice_chat.py         # Voice assistant with microphone and TTS
+├── timetable_tool.py     # Handles timetable extraction, saving, deletion
+├── README.txt            # This file
+└── timetable.json        # (Auto-created) Stores your timetable in JSON
+
+🔧 Setup Instructions:
+Clone your project folder or create a new directory and add all .py files.
+
+Install required packages:
+
+bash
+pip install langchain groq openai pyttsx3 SpeechRecognition pyperclip pynput
+
+Add your Groq API Key (you will be prompted at runtime):
+
+No need to hardcode your key. The script asks for it when run.
+
+▶️ Running the Assistant:
+1. Text Mode (CLI):
 
 bash
 python chatbot_core.py
 
-🎙️ Voice Mode (Mic + Speaker Required)
+Enter your text commands like:
+
+save my timetable
+check grammar
+suggest emoji
+delete my timetable
+
+2. Voice Mode:
 
 bash
 python voice_chat.py
 
-✨ Features
-✅ Clipboard Grammar Correction
-✅ Emoji Suggestion for Copied Text
-✅ Save/Delete Weekly Timetable using GUI (Tkinter)
-✅ Memory-based LangChain conversation
-✅ Wake word detection: “Hey Google”
-✅ Voice interaction using microphone and speaker
-✅ Local SQLite database (timetable.db)
+Say “hey google” to activate. Speak naturally like:
 
-📋 Clipboard Use Cases
-Grammar Check:
+“Check the grammar of copied text”
+“Give me emoji for copied sentence”
+“Save my timetable”
+“Delete my timetable”
 
-Copy a sentence → say "check the context for any grammatical mistakes"
-If incorrect, it will copy the corrected sentence back
+📋 Features Quick Summary:
 
-Emoji Suggestion:
+Feature	Trigger (text or voice)	Action
+Save Timetable	save my timetable	Upload image, auto-extract & save
+Delete Timetable	delete my timetable	Clears saved JSON + LLM memory
+Grammar Check	check grammar	Fix grammar in copied text & update clipboard
+Emoji Suggestion	suggest emoji	Suggest emoji for copied text
 
-Copy a sentence → say "give me an emoji for this sentence"
-It will copy one or two emojis based on the context
-
-🛠️ Setup Instructions
-1. Clone the Repository
-
-bash
-git clone https://github.com/yourusername/LLM.git
-cd LLM
-
-2. Create Virtual Environment
-
-bash
-python -m venv langgraph-env
-source langgraph-env/bin/activate   # On Windows: langgraph-env\Scripts\activate
-
-3. Install Requirements
-
-bash
-pip install -r requirements.txt
-
-4. Run the Assistant
-
-bash
-python chatbot_core.py      # For text mode
-python voice_chat.py        # For voice assistant
-
-🧩 Files & Structure
-bash
-Copy
-Edit
-LLM/
-├── chatbot_core.py        # Core logic (LLM, tools, intent detection)
-├── voice_chat.py          # Voice assistant with wake word + clipboard tools
-├── timetable_tool.py      # GUI + DB for managing class timetable
-├── requirements.txt       # Dependencies
-├── .gitignore             # Git ignored files
-├── README.md              # Project documentation
-├── timetable.db           # SQLite DB (auto-created when needed)
-└── langgraph-env/         # Your Python virtual environment (excluded from Git)
-
-🔐 API Key Note
-You’ll be prompted for your Groq API key when the assistant starts.
-This keeps your key safe and not hardcoded in the script.
-
-📦 Dependencies
-Installable via requirements.txt
-
-📌 Additional Info
-Timetable GUI: Opens when you say "save timetable" or "delete timetable"
-All timings use 24-hour format
-No external cloud storage or servers required – runs completely on your machine
-
+💡 Notes:
+Make sure you have microphone access for voice mode.
+Timetable image parsing uses Groq’s llama-4-scout-17b vision model.
+Extracted timetable is saved as timetable.json in the same folder.
