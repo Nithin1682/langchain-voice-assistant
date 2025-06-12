@@ -1,0 +1,331 @@
+[
+  {
+    "day": "Tuesday",
+    "period": 1,
+    "start": "8:15",
+    "end": "9:05",
+    "subject": "Science"
+  },
+  {
+    "day": "Wednesday",
+    "period": 1,
+    "start": "8:15",
+    "end": "9:05",
+    "subject": "English"
+  },
+  {
+    "day": "Monday",
+    "period": 2,
+    "start": "9:15",
+    "end": "10:05",
+    "subject": "Computing / Immersive"
+  },
+  {
+    "day": "Tuesday",
+    "period": 2,
+    "start": "9:15",
+    "end": "10:05",
+    "subject": "English"
+  },
+  {
+    "day": "Wednesday",
+    "period": 2,
+    "start": "9:15",
+    "end": "10:05",
+    "subject": "Islamic Studies"
+  },
+  {
+    "day": "Thursday",
+    "period": 2,
+    "start": "9:15",
+    "end": "10:05",
+    "subject": "Islamic Studies"
+  },
+  {
+    "day": "Friday",
+    "period": 2,
+    "start": "9:15",
+    "end": "10:05",
+    "subject": "Qur'aan"
+  },
+  {
+    "day": "Monday",
+    "period": 3,
+    "start": "10:05",
+    "end": "10:20",
+    "subject": "Personal Study"
+  },
+  {
+    "day": "Tuesday",
+    "period": 3,
+    "start": "10:05",
+    "end": "10:20",
+    "subject": "Personal Study"
+  },
+  {
+    "day": "Wednesday",
+    "period": 3,
+    "start": "10:05",
+    "end": "10:20",
+    "subject": "Personal Study"
+  },
+  {
+    "day": "Thursday",
+    "period": 3,
+    "start": "10:05",
+    "end": "10:20",
+    "subject": "Personal Study"
+  },
+  {
+    "day": "Friday",
+    "period": 3,
+    "start": "10:05",
+    "end": "10:20",
+    "subject": "Personal Study"
+  },
+  {
+    "day": "Monday",
+    "period": 4,
+    "start": "10:20",
+    "end": "10:40",
+    "subject": "SNACK / BREAK"
+  },
+  {
+    "day": "Tuesday",
+    "period": 4,
+    "start": "10:20",
+    "end": "10:40",
+    "subject": "SNACK / BREAK"
+  },
+  {
+    "day": "Wednesday",
+    "period": 4,
+    "start": "10:20",
+    "end": "10:40",
+    "subject": "SNACK / BREAK"
+  },
+  {
+    "day": "Thursday",
+    "period": 4,
+    "start": "10:20",
+    "end": "10:40",
+    "subject": "SNACK / BREAK"
+  },
+  {
+    "day": "Friday",
+    "period": 4,
+    "start": "10:20",
+    "end": "10:40",
+    "subject": "SNACK / BREAK"
+  },
+  {
+    "day": "Monday",
+    "period": 5,
+    "start": "10:40",
+    "end": "11:30",
+    "subject": "Qur'aan"
+  },
+  {
+    "day": "Tuesday",
+    "period": 5,
+    "start": "10:40",
+    "end": "11:30",
+    "subject": "PSHE"
+  },
+  {
+    "day": "Wednesday",
+    "period": 5,
+    "start": "10:40",
+    "end": "11:30",
+    "subject": "Maths"
+  },
+  {
+    "day": "Thursday",
+    "period": 5,
+    "start": "10:40",
+    "end": "11:30",
+    "subject": "Art"
+  },
+  {
+    "day": "Friday",
+    "period": 5,
+    "start": "10:40",
+    "end": "11:30",
+    "subject": "Maths"
+  },
+  {
+    "day": "Monday",
+    "period": 6,
+    "start": "11:45",
+    "end": "12:35",
+    "subject": "English"
+  },
+  {
+    "day": "Tuesday",
+    "period": 6,
+    "start": "11:45",
+    "end": "12:35",
+    "subject": "Arabic"
+  },
+  {
+    "day": "Wednesday",
+    "period": 6,
+    "start": "11:45",
+    "end": "12:35",
+    "subject": "History"
+  },
+  {
+    "day": "Thursday",
+    "period": 6,
+    "start": "11:45",
+    "end": "12:35",
+    "subject": "Maths"
+  },
+  {
+    "day": "Friday",
+    "period": 6,
+    "start": "11:45",
+    "end": "12:35",
+    "subject": "Arabic"
+  },
+  {
+    "day": "Monday",
+    "period": 7,
+    "start": "12:35",
+    "end": "12:45",
+    "subject": "Reading"
+  },
+  {
+    "day": "Tuesday",
+    "period": 7,
+    "start": "12:35",
+    "end": "12:45",
+    "subject": "Reading"
+  },
+  {
+    "day": "Wednesday",
+    "period": 7,
+    "start": "12:35",
+    "end": "12:45",
+    "subject": "Reading"
+  },
+  {
+    "day": "Thursday",
+    "period": 7,
+    "start": "12:35",
+    "end": "12:45",
+    "subject": "Reading"
+  },
+  {
+    "day": "Friday",
+    "period": 7,
+    "start": "12:35",
+    "end": "12:45",
+    "subject": "Reading"
+  },
+  {
+    "day": "Monday",
+    "period": 8,
+    "start": "12:45",
+    "end": "1:45",
+    "subject": "SALAH / LUNCH"
+  },
+  {
+    "day": "Tuesday",
+    "period": 8,
+    "start": "12:45",
+    "end": "1:45",
+    "subject": "SALAH / LUNCH"
+  },
+  {
+    "day": "Wednesday",
+    "period": 8,
+    "start": "12:45",
+    "end": "1:45",
+    "subject": "SALAH / LUNCH"
+  },
+  {
+    "day": "Thursday",
+    "period": 8,
+    "start": "12:45",
+    "end": "1:45",
+    "subject": "SALAH / LUNCH"
+  },
+  {
+    "day": "Friday",
+    "period": 8,
+    "start": "12:45",
+    "end": "1:45",
+    "subject": "SALAH / LUNCH"
+  },
+  {
+    "day": "Monday",
+    "period": 9,
+    "start": "1:45",
+    "end": "2:35",
+    "subject": "Science"
+  },
+  {
+    "day": "Tuesday",
+    "period": 9,
+    "start": "1:45",
+    "end": "2:35",
+    "subject": "Project Pathway"
+  },
+  {
+    "day": "Wednesday",
+    "period": 9,
+    "start": "1:45",
+    "end": "2:35",
+    "subject": "Geography"
+  },
+  {
+    "day": "Thursday",
+    "period": 9,
+    "start": "1:45",
+    "end": "2:35",
+    "subject": "Science"
+  },
+  {
+    "day": "Friday",
+    "period": 9,
+    "start": "1:45",
+    "end": "2:35",
+    "subject": "Active Hour"
+  },
+  {
+    "day": "Monday",
+    "period": 10,
+    "start": "2:35",
+    "end": "",
+    "subject": "END OF SCHOOL"
+  },
+  {
+    "day": "Tuesday",
+    "period": 10,
+    "start": "2:35",
+    "end": "",
+    "subject": "END OF SCHOOL"
+  },
+  {
+    "day": "Wednesday",
+    "period": 10,
+    "start": "2:35",
+    "end": "",
+    "subject": "END OF SCHOOL"
+  },
+  {
+    "day": "Thursday",
+    "period": 10,
+    "start": "2:35",
+    "end": "",
+    "subject": "END OF SCHOOL"
+  },
+  {
+    "day": "Friday",
+    "period": 10,
+    "start": "2:35",
+    "end": "",
+    "subject": "END OF SCHOOL"
+  }
+]

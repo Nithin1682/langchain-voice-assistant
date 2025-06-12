@@ -1,12 +1,12 @@
+# voice_chat.py (unchanged)
 import speech_recognition as sr
 import pyttsx3
 import time
 import pyperclip
 import re
 
-from chatbot_core import app, enrich_with_datetime, detect_intent, model
+from chatbot_core import app, enrich_with_datetime, detect_intent, check_grammar, suggest_emoji
 from langchain_core.messages import HumanMessage
-from chatbot_core import check_grammar,suggest_emoji  # ensure you have this function in chatbot_core
 
 recognizer = sr.Recognizer()
 tts_engine = pyttsx3.init()
@@ -24,7 +24,7 @@ def remove_emojis(text: str) -> str:
         u"\U00002700-\U000027BF"
         u"\U000024C2-\U0001F251"
         "]+", flags=re.UNICODE)
-    return emoji_pattern.sub(r'', text)
+    return emoji_pattern.sub("", text)
 
 def speak(text: str):
     tts_engine.say(text)
@@ -48,54 +48,52 @@ def chat_with_voice(thread_id: str):
         transcript = listen(timeout=5, phrase_time_limit=5)
         if WAKE_WORD in transcript:
             speak("Yes, how can I help?")
-            active = True
             last_time = time.time()
+            active = True
             while active:
                 user_text = listen(timeout=5, phrase_time_limit=10).strip()
-                if user_text:
-                    print(f"You: {user_text}")
-                    if user_text.lower() == "exit":
-                        speak("Goodbye!")
-                        return
+                if not user_text:
+                    if time.time() - last_time > SILENCE_TIMEOUT:
+                        speak("Going back to sleep.")
+                        active = False
+                    continue
 
-                    # Detect intent using LLM
-                    intent = detect_intent(user_text)
+                print(f"You: {user_text}")
+                if user_text.lower() == "exit":
+                    speak("Goodbye!")
+                    return
 
-                    if intent == "check_grammar":
-                        clipboard_text = pyperclip.paste().strip()
-                        if clipboard_text:
-                            corrected = check_grammar(clipboard_text)
-                            if corrected.strip() != clipboard_text.strip():
-                                pyperclip.copy(corrected)
-                                speak("I found some mistakes. I've corrected and copied it back.")
-                                print(f"Corrected: {corrected}")
-                            else:
-                                speak("No grammatical mistakes in the context.")
+                intent = detect_intent(user_text)
+                if intent == "check_grammar":
+                    txt = pyperclip.paste().strip()
+                    if txt:
+                        corr = check_grammar(txt)
+                        if corr != txt:
+                            pyperclip.copy(corr)
+                            speak("Corrected and copied.")
+                            print(f"Corrected: {corr}")
                         else:
-                            speak("Clipboard is empty. Please copy the sentence first.")
-                        continue  # skip fallback LLM
-                    elif intent == "suggest_emoji":
-                        clipboard_text = pyperclip.paste().strip()
-                        if clipboard_text:
-                            emoji = suggest_emoji(clipboard_text)
-                            pyperclip.copy(emoji)
-                            speak("Here's a suitable emoji suggestion. It's copied to your clipboard.")
-                            print(f"Suggested Emoji: {emoji}")
-                        else:
-                            speak("Clipboard is empty. Please copy the sentence first.")
-                        continue
+                            speak("No mistakes found.")
+                    else:
+                        speak("Clipboard is empty.")
+                    continue
 
-                    last_time = time.time()
-                    human_msg = HumanMessage(content=user_text)
-                    out = app.invoke({"messages": [human_msg]}, cfg)
-                    reply = out["messages"][-1].content
-                    clean_reply = remove_emojis(reply)
-                    print(f"Assistant: {reply}\n")
-                    speak(clean_reply)
+                if intent == "suggest_emoji":
+                    txt = pyperclip.paste().strip()
+                    if txt:
+                        emo = suggest_emoji(txt)
+                        pyperclip.copy(emo)
+                        speak("Emoji suggestion copied.")
+                        print(f"Emoji: {emo}")
+                    else:
+                        speak("Clipboard is empty.")
+                    continue
 
-                elif time.time() - last_time > SILENCE_TIMEOUT:
-                    speak("Going back to sleep.")
-                    active = False
+                last_time = time.time()
+                out = app.invoke({"messages": [HumanMessage(content=user_text)]}, cfg)
+                reply = out["messages"][-1].content
+                print(f"Assistant: {reply}\n")
+                speak(remove_emojis(reply))
 
 if __name__ == "__main__":
     session = input("Thread ID (e.g. 'default'): ")

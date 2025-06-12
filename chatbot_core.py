@@ -1,6 +1,8 @@
+# chatbot_core.py
 import os, getpass
 from datetime import datetime
 import timetable_tool
+import pyperclip
 
 from langchain_core.messages import (
     HumanMessage, AIMessage, SystemMessage, BaseMessage, trim_messages
@@ -17,18 +19,18 @@ from typing_extensions import Annotated, TypedDict
 if not os.environ.get("GROQ_API_KEY"):
     os.environ["GROQ_API_KEY"] = getpass.getpass("Enter API key for Groq: ")
 
-# 2. Initialize the LLM
+# 2. Initialize the LLM for text tasks
 model = init_chat_model("gemma2-9b-it", model_provider="groq")
 
-# 3. Prompt template with full-timetable injection
+# 3. Prompt template with markdown timetable
 prompt_template = ChatPromptTemplate.from_messages([
-    ("system", "You are a helpful assistant. Use the provided timetable to answer questions about classes. Reply in {language}."),
-    ("system", "Here is the user's weekly timetable in markdown format. All times are in 24-hour format:\n\n{timetable_md}"),
-    ("system", "Today is {today}. Current date/time is {datetime} (24-hour format)."),
+    ("system", "You are a helpful assistant. Reply in {language}."),
+    ("system", "Here is the user's weekly timetable in markdown format:\n\n{timetable_md}"),
+    ("system", "Today is {today}. Current date/time: {datetime} (24-hour)."),
     MessagesPlaceholder(variable_name="messages"),
 ])
 
-# 4. Trimmer to keep under token limit
+# 4. Trimmer
 trimmer = trim_messages(
     max_tokens=1024,
     strategy="last",
@@ -38,64 +40,67 @@ trimmer = trim_messages(
     start_on="human",
 )
 
-# 5. State schema
 class State(TypedDict):
     messages: Annotated[Sequence[BaseMessage], add_messages]
     language: str
 
-# 6. Build workflow
 workflow = StateGraph(state_schema=State)
 
 def call_model(state: State):
     last = state["messages"][-1]
-    thread_id = state.get("configurable", {}).get("thread_id", "default")
+    tid = state.get("configurable", {}).get("thread_id", "default")
 
     if isinstance(last, HumanMessage):
-        user_input = last.content
-        intent = detect_intent(user_input)
-
-        if intent == "save_timetable":
-            result = timetable_tool.save_timetable_gui()
+        intent = detect_intent(last.content)
+        if intent == "save my timetable":
+            return {"messages": [AIMessage(content=timetable_tool.save_timetable_image())]}
+        if intent == "delete my timetable":
+            out = timetable_tool.delete_timetable()
+            memory.delete_thread(tid)
+            return {"messages": [AIMessage(content=out)]}
+        if intent == "check_grammar":
+            text = pyperclip.paste().strip()
+            result = check_grammar(text)
             return {"messages": [AIMessage(content=result)]}
-
-        if intent == "delete_timetable":
-            result = timetable_tool.delete_timetable()
-            memory.delete_thread(thread_id)
+        if intent == "suggest_emoji":
+            text = pyperclip.paste().strip()
+            result = suggest_emoji(text)
             return {"messages": [AIMessage(content=result)]}
+        # Else, fallback to general model handling
 
-    # LLM fallback
-    trimmed       = trimmer.invoke(state["messages"])
-    timetable_md  = timetable_tool.get_timetable_markdown()
-    now_str       = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    today_name    = datetime.now().strftime("%A")
+    # fallback: inject markdown
+    trimmed = trimmer.invoke(state["messages"])
+    timetable_md = timetable_tool.load_timetable_json(raw=False)
+    now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    today_name = datetime.now().strftime("%A")
 
     prompt = prompt_template.invoke({
         "timetable_md": timetable_md,
-        "datetime":     now_str,
-        "today":        today_name,
-        "language":     state.get("language", "English"),
-        "messages":     trimmed,
+        "datetime": now_str,
+        "today": today_name,
+        "language": state.get("language", "English"),
+        "messages": trimmed
     })
-    response = model.invoke(prompt)
-    return {"messages": [response]}
-
+    resp = model.invoke(prompt)
+    return {"messages": [resp]}
 
 
 workflow.add_edge(START, "model")
 workflow.add_node("model", call_model)
 
-# 7. Compile with memory
 memory = MemorySaver()
 app = workflow.compile(checkpointer=memory)
 
-# 8. Inject initial date/time
+# inject initial date/time
 
 def enrich_with_datetime(thread_id: str):
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    msg = SystemMessage(content=f"Current date/time: {now}")
-    app.invoke({"messages": [msg]}, {"configurable": {"thread_id": thread_id}})
+    app.invoke(
+        {"messages": [SystemMessage(content=f"Current date/time: {now}")]},
+        {"configurable": {"thread_id": thread_id}}
+    )
 
-# 9. Plain‐text chat
+# plain-chat
 
 def plain_chat(thread_id: str):
     enrich_with_datetime(thread_id)
@@ -105,35 +110,44 @@ def plain_chat(thread_id: str):
         ui = input("You: ").strip()
         if ui.lower() == "exit":
             break
-        human_msg = HumanMessage(content=ui)
-        out = app.invoke({"messages": [human_msg]}, cfg)
+        out = app.invoke({"messages": [HumanMessage(content=ui)]}, cfg)
         print("Assistant:", out["messages"][-1].content, "\n")
 
+# intent & utilities unchanged
+
 def detect_intent(user_input: str) -> str:
-    intent_prompt = [
-        SystemMessage(content="You are an intent classifier. Given a user input, return only one of the following intents: save_timetable, delete_timetable, check_grammar,suggest_emoji, none."),
+    prompt = [
+        SystemMessage(content="""You are an intent classifier.
+
+Given a user input, respond with the most appropriate intent from this list:
+- save my timetable
+- delete my timetable
+- check_grammar
+- suggest_emoji
+- none
+
+Your response should be only one word: the intent itself. If you're not sure, respond with 'none'."""),
         HumanMessage(content=f"Input: {user_input}\nIntent:")
     ]
-    response = model.invoke(intent_prompt)
-    return response.content.strip().lower()
+    result = model.invoke(prompt).content.strip().lower()
+    return result if result in {"save my timetable", "delete my timetable", "check_grammar", "suggest_emoji"} else "none"
+
+
 
 def check_grammar(text: str) -> str:
-    grammar_prompt = [
-        SystemMessage(content="You are a grammar correction assistant. If the sentence has grammar mistakes, return a corrected version. If it's already correct, return the same sentence."),
+    prompt = [
+        SystemMessage(content="You are a grammar correction assistant. If errors, return corrected sentence; else return the same."),
         HumanMessage(content=text)
     ]
-    response = model.invoke(grammar_prompt)
-    return response.content.strip()
+    return model.invoke(prompt).content.strip()
+
 
 def suggest_emoji(sentence: str) -> str:
     prompt = [
-        SystemMessage(content="You are an emoji suggester. Given a user sentence, reply with one or two emojis that best express its meaning or emotion. Do not include any other text."),
+        SystemMessage(content="You are an emoji suggester. Respond with one or two emojis only."),
         HumanMessage(content=sentence)
     ]
-    response = model.invoke(prompt)
-    return response.content.strip()
-
-
+    return model.invoke(prompt).content.strip()
 
 if __name__ == "__main__":
     session = input("Enter thread ID (e.g., 'default'): ")
