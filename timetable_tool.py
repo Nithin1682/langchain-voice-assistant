@@ -1,4 +1,3 @@
-# timetable_tool.py
 import os
 import json
 import base64
@@ -6,14 +5,11 @@ import tkinter as tk
 from tkinter import filedialog
 from groq import Groq
 
-# Path for your saved JSON timetable
 JSON_PATH = os.environ.get("TIMETABLE_JSON", "timetable.json")
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 
-
 def _exists() -> bool:
     return os.path.isfile(JSON_PATH)
-
 
 def _transform_table_schema(raw: list) -> list:
     days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
@@ -36,12 +32,10 @@ def _transform_table_schema(raw: list) -> list:
                 })
     return transformed
 
-
 def save_timetable_image() -> str:
     if _exists():
         return "There is a timetable already saved."
 
-    # 1. File-picker
     root = tk.Tk()
     root.withdraw()
     file_path = filedialog.askopenfilename(
@@ -51,16 +45,12 @@ def save_timetable_image() -> str:
     if not file_path:
         return "No image selected — timetable not saved."
 
-    # 2. Read & base64-encode
     with open(file_path, "rb") as f:
         img_bytes = f.read()
     img_b64 = base64.b64encode(img_bytes).decode("utf-8")
-
-    # 3. MIME type
     ext = file_path.rsplit('.', 1)[-1].lower()
     mime = "image/jpeg" if ext in ("jpg", "jpeg") else f"image/{ext}"
 
-    # 4. Send to Groq LLaMA-4 Scout
     client = Groq(api_key=GROQ_API_KEY)
     response = client.chat.completions.create(
         model="meta-llama/llama-4-scout-17b-16e-instruct",
@@ -75,7 +65,6 @@ def save_timetable_image() -> str:
         max_completion_tokens=1024
     )
 
-    # 5. Clean up fences + parse
     raw_content = response.choices[0].message.content.strip()
     if raw_content.startswith("```"):
         lines = raw_content.splitlines()
@@ -97,24 +86,18 @@ def save_timetable_image() -> str:
         with open(JSON_PATH, "w", encoding="utf-8") as jf:
             json.dump(data, jf, indent=2)
         return "✅ Timetable extracted and saved to JSON."
-
     except json.JSONDecodeError:
         return f"❌ Failed to parse JSON. Cleaned content was:\n\n{json_str}"
     except Exception as e:
         return f"❌ Unexpected error: {e}"
 
-
 def load_timetable_json(raw: bool = False) -> str:
     if not _exists():
-        return "[]" if raw else "The timetable is currently empty."
-
+        return "[]" if raw else ""
     with open(JSON_PATH, "r", encoding="utf-8") as jf:
         data = json.load(jf)
-
     if raw:
         return json.dumps(data, indent=2)
-
-    # build markdown
     lines = ["| Day     | Period | Start  | End    | Subject            |",
              "|---------|--------|--------|--------|--------------------|"]
     for entry in data:
@@ -123,9 +106,12 @@ def load_timetable_json(raw: bool = False) -> str:
         )
     return "\n".join(lines)
 
-
 def delete_timetable() -> str:
+    #print("🔍 Checking for timetable file...")
     if _exists():
+        #print("🗑️ Timetable found. Deleting...")
+       # print(f"📄 Attempting to delete file: {os.path.abspath(JSON_PATH)}")
         os.remove(JSON_PATH)
-        return "Your timetable has been deleted."
+        #print("✅ File deleted!")
+        return "✅ Your timetable has been deleted."
     return "No timetable was saved."
